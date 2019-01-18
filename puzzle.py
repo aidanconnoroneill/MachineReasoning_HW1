@@ -6,6 +6,8 @@ class Puzzle:
     def __init__(self, size):
         self.size = size
 
+        ###While true:
+        ###     fill arrays with 1-size.  If h2 is 0 mod 2 break, otherwise continue
         for i in range(0, size):
             my_row = []
             for j in range(0, size):
