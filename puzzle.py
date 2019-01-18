@@ -59,6 +59,33 @@ class Puzzle:
             for col in range(0, self.size):
                 print(self.squares[row][col]),
             print " "
+        print ""
+
+    def h1(self):
+        count = 0
+        cur = -1
+        for row in range(0, self.size):
+            for col in range(0, self.size):
+                cur = self.squares[row][col]
+                if (cur != -1 and cur != row * self.size + col + 1):
+                    count += 1
+        return count
+
+    def h2(self):
+        count = 0
+        proper_row = 0
+        proper_col = 0
+        cur = -1
+        for row in range(0, self.size):
+            for col in range(0, self.size):
+                cur = self.squares[row][col]
+                if cur != -1:
+                    proper_row = cur / self.size
+                    proper_col = cur % self.size
+            if cur != -1:
+                count += abs(proper_row - row)
+                count += abs(proper_col - col)
+        return count
 
 
 ##testing
@@ -81,17 +108,13 @@ print puzzle.left()
 
 #left
 print puzzle.left()
-print " "
 puzzle.pretty_print()
 #right
 print puzzle.right()
-print " "
 puzzle.pretty_print()
 #up
 print puzzle.up()
-print " "
 puzzle.pretty_print()
 #down
 print puzzle.down()
-print " "
 puzzle.pretty_print()
