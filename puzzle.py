@@ -10,6 +10,7 @@ class Puzzle:
         self.size = size
         so_far = []
         cur = -1
+        taxi_cab = -1
         for i in range(0, size):
             my_row = []
             for j in range(0, size):
@@ -22,7 +23,19 @@ class Puzzle:
                     my_row.append(cur)
                 else:
                     my_row.append(-1)
+                    taxi_cab = size - i + size - j - 2
+                    # print "taxi cab: "
+                    # print taxi_cab
             self.squares.append(my_row)
+
+    def get_perms(self):
+        sol = []
+        for i in range(1, self.size*self.size-2):
+            sol.append(i)
+        sol.append(-1)
+        for row in range(0, self.size):
+            for col in range(0, self.size):
+
 
     def get_state(self):
         return squares
