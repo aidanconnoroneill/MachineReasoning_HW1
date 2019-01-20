@@ -30,12 +30,14 @@ class Puzzle:
 
     def get_perms(self):
         sol = []
-        for i in range(1, self.size*self.size-2):
+        for i in range(1, self.size * self.size):
             sol.append(i)
         sol.append(-1)
-        for row in range(0, self.size):
-            for col in range(0, self.size):
-
+        mine = []
+        for i in range(0, self.size):
+            for j in range(0, self.size):
+                mine.append(sol[i][j])
+        print sol
 
     def get_state(self):
         return squares
@@ -112,7 +114,7 @@ class Puzzle:
 ##testing
 puzzle = Puzzle(3)
 puzzle.pretty_print()
-
+puzzle.get_perms()
 #error testing
 print "Should be four falses"
 print puzzle.down()
