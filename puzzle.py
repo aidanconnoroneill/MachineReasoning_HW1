@@ -1,3 +1,6 @@
+import random
+
+
 class Puzzle:
 
     squares = []
@@ -5,14 +8,18 @@ class Puzzle:
 
     def __init__(self, size):
         self.size = size
-
-        ###While true:
-        ###     fill arrays with 1-size.  If h2 is 0 mod 2 break, otherwise continue
+        so_far = []
+        cur = -1
         for i in range(0, size):
             my_row = []
             for j in range(0, size):
-                if ((i != size - 1 or j != size - 1)):
-                    my_row.append(i * size + j + 1)
+                while True:
+                    cur = random.randint(0, size * size - 1)
+                    if not cur in so_far:
+                        break
+                so_far.append(cur)
+                if cur != 0:
+                    my_row.append(cur)
                 else:
                     my_row.append(-1)
             self.squares.append(my_row)
@@ -82,11 +89,10 @@ class Puzzle:
             for col in range(0, self.size):
                 cur = self.squares[row][col]
                 if cur != -1:
-                    proper_row = cur / self.size
-                    proper_col = cur % self.size
-            if cur != -1:
-                count += abs(proper_row - row)
-                count += abs(proper_col - col)
+                    proper_row = (cur - 1) / self.size
+                    proper_col = (cur - 1) % self.size
+                    count += abs(proper_row - row)
+                    count += abs(proper_col - col)
         return count
 
 
@@ -120,3 +126,5 @@ puzzle.pretty_print()
 #down
 print puzzle.down()
 puzzle.pretty_print()
+print puzzle.h1()
+print puzzle.h2()
