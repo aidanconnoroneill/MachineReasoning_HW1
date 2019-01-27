@@ -182,17 +182,35 @@ class Puzzle:
                     count += abs(proper_col - col)
         return count
 
-    def get_moves(self, board):
-        return True
-
-    def search(self, is_h1):
+    def get_moves(self):
+        #returns a list of possible new puzzles
+        legal_moves = []
+        if right(self):
+            legal_moves.append(right(self))
+        if left(self):
+            legal_moves.append(left(self))
+        if up(self):
+            legal_moves.append(up(self))
+        if down(self):
+            legal_moves.append(down(self))
+            
+        return legal_moves
+    #A* algorithm, takes a starting point and integer 1,2, or 3
+    #that defines the heuristic to use
+    def search(self, num_h):
+        #use to ensure we don't enter an infinte loop
         past_states = []
         heap = []
-        for move in get_moves:
-            if is_h1:
-                heappush(heap, (h1(move), move))
-            else:
+        for move in get_moves(self):
+            if heuristic == 1:
+                heappush(heap, (h1(move) + , move))
+            elif heuristic == 2:
                 heappush(heap, (h2(move), move))
+            #for when we implement the third heuristic
+            elif heuristic == 3:
+                #heappush(heap,(h3(move), move))
+            else 
+                raise ValueError('invalid heuristic number')
         while heap:
             state = heappop(heap)
             if state == my_goal:
