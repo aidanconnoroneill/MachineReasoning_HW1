@@ -1,4 +1,5 @@
 import random
+import heapq
 
 
 class Puzzle:
@@ -30,41 +31,41 @@ class Puzzle:
         #ensures we have an (odd) solvable puzzle
         if self.invariant() % 2 == 0:
             self.switch_not_blank()
-            
-    #returns the number of cycles of the board   
+
+    #returns the number of cycles of the board
     def board_parity(self):
         #doesn't count the last cycle since the
         #list will be full, so start at 1
-        count = 0    
-        
+        count = 0
+
         #a basic list of numbers used to make
         #a permutation
         basic = []
         for i in range(1, self.size * self.size):
             basic.append(i)
-        basic.append(-1)    
-    
+        basic.append(-1)
+
         #list form of the board
         list_form = []
         for row in range(0, self.size):
             for col in range(0, self.size):
-                list_form.append(self.squares[row][col])      
-        
+                list_form.append(self.squares[row][col])
+
         # print list_form, '\n', basic
-        
+
         #the list of all the visted ones, stop when we've hit every number
         visited = []
         curNum = list_form[0]
-        
+
         #move through it until you've hit all the numbers
         while len(visited) < self.size * self.size:
             #loop through until we find a cycle
-            for i in range (self.size * self.size):
-                if  curNum in visited:
+            for i in range(self.size * self.size):
+                if curNum in visited:
                     #complete cycle, up counter
                     count += 1
                     #find a number not in any previous cycle
-                    for j in range (self.size * self.size):
+                    for j in range(self.size * self.size):
                         if list_form[j] not in visited:
                             curNum = list_form[j]
                             break
@@ -74,43 +75,42 @@ class Puzzle:
                     visited.append(curNum)
                     new_Index = list_form.index(curNum)
                     curNum = basic[new_Index]
-        
+
         #in the case that it's one long cycle, it doesn't get counted
         #so compensate for this
         if count == 0:
             return 1
         return count
-        
-        
-    #returns a tuple of the position of the blank 
+
+    #returns a tuple of the position of the blank
     def find_blank(self):
         for row in range(0, self.size):
             for col in range(0, self.size):
                 if self.squares[row][col] == -1:
-                    return (row,col)
-                    
+                    return (row, col)
+
     #returns the taxicab distance of the blank
     #from the lower right corner
     def taxicab(self):
         return (self.size - 1) * 2 - self.find_blank()[0] - self.find_blank()[1]
-    
+
     #returns the invariant number associatied with
     #the board
     def invariant(self):
         return self.taxicab() + self.board_parity()
-    
+
     #switches two tiles on the board with each other,
     #neither of which are the blank
     def switch_not_blank(self):
         if self.squares[0][0] != -1 and self.squares[0][1] != -1:
-            store = self.squares [0][0]
-            self.squares [0][0] = self.squares[0][1]
-            self.squares [0][1] = store
+            store = self.squares[0][0]
+            self.squares[0][0] = self.squares[0][1]
+            self.squares[0][1] = store
         else:
             store = self.squares[1][0]
             self.squares[1][0] = self.squares[1][1]
             self.squares[1][1] = store
-        
+
     def get_state(self):
         return squares
 
@@ -157,30 +157,40 @@ class Puzzle:
             print " "
         print ""
 
-    def h1(self):
+    def h1(self, board):
         count = 0
         cur = -1
         for row in range(0, self.size):
             for col in range(0, self.size):
-                cur = self.squares[row][col]
+                cur = board[row][col]
                 if (cur != -1 and cur != row * self.size + col + 1):
                     count += 1
         return count
 
-    def h2(self):
+    def h2(self, board):
         count = 0
         proper_row = 0
         proper_col = 0
         cur = -1
         for row in range(0, self.size):
             for col in range(0, self.size):
-                cur = self.squares[row][col]
+                cur = board[row][col]
                 if cur != -1:
                     proper_row = (cur - 1) / self.size
                     proper_col = (cur - 1) % self.size
                     count += abs(proper_row - row)
                     count += abs(proper_col - col)
         return count
+
+    def get_moves(self, board):
+        return True
+
+    def search(self, is_h1):
+        past_states = []
+        heap = []
+        for move in get_moves:
+            if is_h1:
+                heappush(heap, (h1(move), ))
 
 
 ##testing
@@ -192,8 +202,6 @@ puzzle.pretty_print()
 print 'invariant', puzzle.invariant()
 # puzzle1 = Puzzle(4)
 # puzzle.pretty_print()
-
-
 
 # counter1 = 0
 # counter2 = 0
@@ -225,9 +233,3 @@ print 'invariant', puzzle.invariant()
 #         counter8 +=1
 #
 # print counter1, counter2, counter3, counter4, counter5, counter6, counter7, counter8,
-        
-    
-
-
-
-
