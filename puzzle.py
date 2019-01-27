@@ -190,7 +190,13 @@ class Puzzle:
         heap = []
         for move in get_moves:
             if is_h1:
-                heappush(heap, (h1(move), ))
+                heappush(heap, (h1(move), move))
+            else:
+                heappush(heap, (h2(move), move))
+        while heap:
+            state = heappop(heap)
+            if state == my_goal:
+                return True
 
 
 ##testing
