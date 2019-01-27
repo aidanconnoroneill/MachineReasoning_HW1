@@ -6,6 +6,7 @@ class Puzzle:
 
     squares = []
     size = -1
+    
 
     def __init__(self, size):
         self.size = size
@@ -192,31 +193,39 @@ class Puzzle:
         if up(self):
             legal_moves.append(up(self))
         if down(self):
-            legal_moves.append(down(self))
-            
+            legal_moves.append(down(self)
         return legal_moves
+        
+    def f(self):
+        return  
+        
+    def update_frontier (self):
+        for move in get_moves(self):
+            if heuristic == 1:
+                heappush(heap, (h1(move) + g(move), move, ))
+            elif heuristic == 2:
+                heappush(heap, (h2(move) + g(move), move))
+            #for when we implement the third heuristic
+            elif heuristic == 3:
+                #heappush(heap,(h3(move) + g(move), move))
+            else 
+                raise ValueError('invalid heuristic number')
+                
+                
     #A* algorithm, takes a starting point and integer 1,2, or 3
     #that defines the heuristic to use
     def search(self, num_h):
         #use to ensure we don't enter an infinte loop
         past_states = []
+        #priorityQueue
         heap = []
-        for move in get_moves(self):
-            if heuristic == 1:
-                heappush(heap, (h1(move) + , move))
-            elif heuristic == 2:
-                heappush(heap, (h2(move), move))
-            #for when we implement the third heuristic
-            elif heuristic == 3:
-                #heappush(heap,(h3(move), move))
-            else 
-                raise ValueError('invalid heuristic number')
+        update_frontier(self)
+        
         while heap:
             state = heappop(heap)
             if state == my_goal:
                 return True
-
-
+            
 ##testing
 
 #why are these the same???
