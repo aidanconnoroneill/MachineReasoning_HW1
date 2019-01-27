@@ -196,18 +196,20 @@ class Puzzle:
             legal_moves.append(down(self)
         return legal_moves
         
+    #should return the sum of the distance to this node
+    #plus the heuristic
     def f(self):
-        return  
+        return 5
         
     def update_frontier (self):
         for move in get_moves(self):
             if heuristic == 1:
-                heappush(heap, (h1(move) + g(move), move, ))
+                heappush(heap, f(move), move, ))
             elif heuristic == 2:
-                heappush(heap, (h2(move) + g(move), move))
+                heappush(heap, f(move), move))
             #for when we implement the third heuristic
             elif heuristic == 3:
-                #heappush(heap,(h3(move) + g(move), move))
+                #heappush(heap, f(move), move))
             else 
                 raise ValueError('invalid heuristic number')
                 
@@ -219,13 +221,18 @@ class Puzzle:
         past_states = []
         #priorityQueue
         heap = []
-        update_frontier(self)
         
+        #inialize
+        heappush((heap, f(self)))
+        
+        #while there's stuff in the heap
         while heap:
             state = heappop(heap)
             if state == my_goal:
                 return True
-            
+            else 
+                update_frontier(state)
+         return False   
 ##testing
 
 #why are these the same???
