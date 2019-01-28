@@ -1,5 +1,58 @@
 import random
+import copy
 from heapq import heappush, heappop
+
+
+def pretty_print_2(size, board):
+    for row in range(0, size):
+        for col in range(0, size):
+            print(board[row][col]),
+        print " "
+    print ""
+
+
+def down(size, board):
+    for row in range(0, size - 1):
+        for col in range(0, size):
+            if (board[row][col] == -1):
+                ans = copy.copy(board)
+                ans[row][col] = ans[row + 1][col]
+                ans[row + 1][col] = -1
+                return (True, ans)
+    return (False, board)
+
+
+def up(size, board):
+    for row in range(1, size):
+        for col in range(0, size):
+            if (board[row][col] == -1):
+                ans = copy.copy(board)
+                ans[row][col] = ans[row - 1][col]
+                ans[row - 1][col] = -1
+                return (True, ans)
+    return (False, board)
+
+
+def left(size, board):
+    for row in range(0, size):
+        for col in range(1, size):
+            if (board[row][col] == -1):
+                ans = copy.copy(board)
+                ans[row][col] = ans[row][col - 1]
+                ans[row][col - 1] = -1
+                return (True, ans)
+    return (False, board)
+
+
+def right(size, board):
+    for row in range(0, size):
+        for col in range(0, size - 1):
+            if (board[row][col] == -1):
+                ans = copy.copy(board)
+                ans[row][col] = ans[row][col + 1]
+                ans[row][col + 1] = -1
+                return (True, ans)
+    return (False, board)
 
 
 class Puzzle:
@@ -121,47 +174,7 @@ class Puzzle:
             self.squares[1][1] = store
 
     def get_state(self):
-        return squares
-
-    def down(self):
-        for row in range(0, self.size - 1):
-            for col in range(0, self.size):
-                if (self.squares[row][col] == -1):
-                    ans = self.squares
-                    ans[row][col] = ans[row + 1][col]
-                    ans[row + 1][col] = -1
-                    return (True, ans)
-        return (False, self.squares)
-
-    def up(self):
-        for row in range(1, self.size):
-            for col in range(0, self.size):
-                if (self.squares[row][col] == -1):
-                    ans = self.squares
-                    ans[row][col] = ans[row - 1][col]
-                    ans[row - 1][col] = -1
-                    return (True, ans)
-        return (False, self.squares)
-
-    def left(self):
-        for row in range(0, self.size):
-            for col in range(1, self.size):
-                if (self.squares[row][col] == -1):
-                    ans = self.squares
-                    ans[row][col] = ans[row][col - 1]
-                    ans[row][col - 1] = -1
-                    return (True, ans)
-        return (False, self.squares)
-
-    def right(self):
-        for row in range(0, self.size):
-            for col in range(0, self.size - 1):
-                if (self.squares[row][col] == -1):
-                    ans = self.squares
-                    ans[row][col] = ans[row][col + 1]
-                    ans[row][col + 1] = -1
-                    return (True, ans)
-        return (False, self.squares)
+        return self.squares
 
     def pretty_print(self):
         for row in range(0, self.size):
@@ -174,18 +187,23 @@ class Puzzle:
     def get_moves(self, state):
         #returns a list of possible new puzzles
         legal_moves = []
-        move = self.right()
+        move = right(self.size, state)
         if move[0]:
+            print 'here, right'
             legal_moves.append(move[1])
-        move = self.left()
+        move = left(self.size, state)
         if move[0]:
+            print 'here, left'
             legal_moves.append(move[1])
-        move = self.up()
+        move = up(self.size, state)
         if move[0]:
+            print 'here, up'
             legal_moves.append(move[1])
-        move = self.down()
+        move = down(self.size, state)
         if move[0]:
+            print 'here, down'
             legal_moves.append(move[1])
+
         return legal_moves
 
     def h1(self, board):
@@ -244,16 +262,19 @@ class Puzzle:
 
         init_heap_tuple = (h, self.squares, 0)
         heappush(heap, init_heap_tuple)
-
+        print heap
         #while there's stuff in the heap
         while heap:
             best_move = heappop(heap)
             self.squares = best_move[1]
-            self.pretty_print()
+            # self.pretty_print()
             if self.squares == self.my_goal:
                 return True
             else:
-                moves = self.get_moves(self.squares)
+                moves = self.get_moves(copy.copy(self.squares))
+                for move in moves:
+                    pretty_print_2(self.size, move)
+                quit()
                 for move in moves:
                     heappush(heap, (self.f(best_move, num_h), self.squares,
                                     best_move[2] + 1))
@@ -268,6 +289,11 @@ puzzle = Puzzle(3)
 puzzle.pretty_print()
 #this will always be odd now
 print 'invariant', puzzle.invariant()
+
+# puzzle.pretty_print_2(puzzlright()[1])
+# puzzle.pretty_print_2(puzzle.left()[1])
+# puzzle.pretty_print_2(puzzle.up()[1])
+# puzzle.pretty_print_2(puzzle.down()[1])
 
 puzzle.search(1)
 # puzzle1 = Puzzle(4)
