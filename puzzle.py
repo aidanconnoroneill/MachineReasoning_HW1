@@ -15,7 +15,7 @@ def down(size, board):
     for row in range(0, size - 1):
         for col in range(0, size):
             if (board[row][col] == -1):
-                ans = copy.copy(board)
+                ans = copy.deepcopy(board)
                 ans[row][col] = ans[row + 1][col]
                 ans[row + 1][col] = -1
                 return (True, ans)
@@ -26,7 +26,7 @@ def up(size, board):
     for row in range(1, size):
         for col in range(0, size):
             if (board[row][col] == -1):
-                ans = copy.copy(board)
+                ans = copy.deepcopy(board)
                 ans[row][col] = ans[row - 1][col]
                 ans[row - 1][col] = -1
                 return (True, ans)
@@ -37,7 +37,7 @@ def left(size, board):
     for row in range(0, size):
         for col in range(1, size):
             if (board[row][col] == -1):
-                ans = copy.copy(board)
+                ans = copy.deepcopy(board)
                 ans[row][col] = ans[row][col - 1]
                 ans[row][col - 1] = -1
                 return (True, ans)
@@ -48,7 +48,7 @@ def right(size, board):
     for row in range(0, size):
         for col in range(0, size - 1):
             if (board[row][col] == -1):
-                ans = copy.copy(board)
+                ans = copy.deepcopy(board)
                 ans[row][col] = ans[row][col + 1]
                 ans[row][col + 1] = -1
                 return (True, ans)
@@ -187,7 +187,7 @@ class Puzzle:
     def get_moves(self, state):
         #returns a list of possible new puzzles
         legal_moves = []
-        move = right(self.size, state)
+        move = right(self.size, copy.deepcopy(state))
         if move[0]:
             print 'here, right'
             legal_moves.append(move[1])
@@ -271,7 +271,8 @@ class Puzzle:
             if self.squares == self.my_goal:
                 return True
             else:
-                moves = self.get_moves(copy.copy(self.squares))
+                moves = self.get_moves(self.squares)
+                print moves
                 for move in moves:
                     pretty_print_2(self.size, move)
                 quit()
