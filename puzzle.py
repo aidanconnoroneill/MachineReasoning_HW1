@@ -67,7 +67,10 @@ class Puzzle:
         for i in range(0, size):
             my_row = []
             for j in range(0, size):
-                my_row.append(count)
+                if (i == size - 1 and j == size - 1):
+                    my_row.append(-1)
+                else:
+                    my_row.append(count)
                 count += 1
             self.my_goal.append(my_row)
 
@@ -268,14 +271,15 @@ class Puzzle:
             best_move = heappop(heap)
             self.squares = best_move[1]
             # self.pretty_print()
+            pretty_print_2(self.size, self.my_goal)
             if self.squares == self.my_goal:
                 return True
             else:
                 moves = self.get_moves(self.squares)
-                print moves
-                for move in moves:
-                    pretty_print_2(self.size, move)
-                quit()
+                # print moves
+                # for move in moves:
+                #     pretty_print_2(self.size, move)
+                # quit()
                 for move in moves:
                     heappush(heap, (self.f(best_move, num_h), self.squares,
                                     best_move[2] + 1))
