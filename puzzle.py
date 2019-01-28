@@ -1,6 +1,7 @@
 import random
 import copy
 from heapq import heappush, heappop
+import time
 
 
 def pretty_print_2(size, board):
@@ -11,48 +12,6 @@ def pretty_print_2(size, board):
     print ""
 
 
-def down(size, board):
-    for row in range(0, size - 1):
-        for col in range(0, size):
-            if (board[row][col] == -1):
-                ans = copy.deepcopy(board)
-                ans[row][col] = ans[row + 1][col]
-                ans[row + 1][col] = -1
-                return (True, ans)
-    return (False, board)
-
-
-def up(size, board):
-    for row in range(1, size):
-        for col in range(0, size):
-            if (board[row][col] == -1):
-                ans = copy.deepcopy(board)
-                ans[row][col] = ans[row - 1][col]
-                ans[row - 1][col] = -1
-                return (True, ans)
-    return (False, board)
-
-
-def left(size, board):
-    for row in range(0, size):
-        for col in range(1, size):
-            if (board[row][col] == -1):
-                ans = copy.deepcopy(board)
-                ans[row][col] = ans[row][col - 1]
-                ans[row][col - 1] = -1
-                return (True, ans)
-    return (False, board)
-
-
-def right(size, board):
-    for row in range(0, size):
-        for col in range(0, size - 1):
-            if (board[row][col] == -1):
-                ans = copy.deepcopy(board)
-                ans[row][col] = ans[row][col + 1]
-                ans[row][col + 1] = -1
-                return (True, ans)
-    return (False, board)
 
 
 class Puzzle:
@@ -60,6 +19,52 @@ class Puzzle:
     squares = []
     size = -1
     my_goal = []
+    g = 0
+    
+    #movement methods return a touple of the boolean sucess of the move
+    #and a new puzzle *object*, if possible
+    def down(self):
+        for row in range(0, self.size - 1):
+            for col in range(0, self.size):
+                if self.squares[row][col] == -1:
+                    ans = copy.deepcopy(self)
+                    ans.squares[row][col] = ans.squares[row + 1][col]
+                    ans.squares[row + 1][col] = -1
+                    return (True, ans)
+        return (False, self)
+
+
+    def up(self):
+        for row in range(1, self.size):
+            for col in range(0, self.size):
+                if self.squares[row][col] == -1:
+                    ans = copy.deepcopy(self)
+                    ans.squares[row][col] = ans.squares[row - 1][col]
+                    ans.squares[row - 1][col] = -1
+                    return (True, ans)
+        return (False, self)
+
+
+    def left(self):
+        for row in range(0, self.size):
+            for col in range(1, self.size):
+                if self.squares[row][col] == -1:
+                    ans = copy.deepcopy(self)
+                    ans.squares[row][col] = ans.squares[row][col - 1]
+                    ans.squares[row][col - 1] = -1
+                    return (True, ans)
+        return (False, self)
+
+
+    def right(self):
+        for row in range(0, self.size):
+            for col in range(0, self.size - 1):
+                if self.squares[row][col] == -1:
+                    ans = copy.deepcopy(self)
+                    ans.squares[row][col] = ans.squares[row][col + 1]
+                    ans.squares[row][col + 1] = -1
+                    return (True, ans)
+        return (False, self)
 
     def __init__(self, size):
         self.size = size
@@ -147,17 +152,17 @@ class Puzzle:
             return 1
         return count
 
-    #returns a tuple of the position of the blank
+    #returns a tuple of the position of the blank, zero indexed
     def find_blank(self):
-        for row in range(0, self.size):
-            for col in range(0, self.size):
+        for row in range(self.size):
+            for col in range(self.size):
                 if self.squares[row][col] == -1:
                     return (row, col)
 
     #returns the taxicab distance of the blank
     #from the lower right corner
     def taxicab(self):
-        return (self.size - 1) * 2 - self.find_blank()[0] - self.find_blank()[1]
+        return (self.size - 1 * - self.find_blank()[0]) - (self.size-1 - self.find_blank()[1])
 
     #returns the invariant number associatied with
     #the board
@@ -167,10 +172,12 @@ class Puzzle:
     #switches two tiles on the board with each other,
     #neither of which are the blank
     def switch_not_blank(self):
+        #if neither of the first two are the blank, switch them
         if self.squares[0][0] != -1 and self.squares[0][1] != -1:
             store = self.squares[0][0]
             self.squares[0][0] = self.squares[0][1]
             self.squares[0][1] = store
+        #otherwise switch the other two
         else:
             store = self.squares[1][0]
             self.squares[1][0] = self.squares[1][1]
@@ -187,42 +194,44 @@ class Puzzle:
         print ""
 
     #returns a list of legal square states
-    def get_moves(self, state):
-        #returns a list of possible new puzzles
+    def get_moves(self):
+        #returns a list of possible moves, in the form of puzzle objects
         legal_moves = []
-        move = right(self.size, copy.deepcopy(state))
+        move = self.right()
+        #tests the boolean return
+        if move[0]:
+            #adds the changed board
+            legal_moves.append(move[1])
+        move = self.left()
         if move[0]:
             legal_moves.append(move[1])
-        move = left(self.size, state)
+        move = self.up()
         if move[0]:
             legal_moves.append(move[1])
-        move = up(self.size, state)
-        if move[0]:
-            legal_moves.append(move[1])
-        move = down(self.size, state)
+        move = self.down()
         if move[0]:
             legal_moves.append(move[1])
 
         return legal_moves
 
-    def h1(self, board):
+    def h1(self):
         count = 0
         cur = -1
         for row in range(0, self.size):
             for col in range(0, self.size):
-                cur = board[row][col]
+                cur = self.squares[row][col]
                 if (cur != -1 and cur != row * self.size + col + 1):
                     count += 1
         return count
 
-    def h2(self, board):
+    def h2(self):
         count = 0
         proper_row = 0
         proper_col = 0
         cur = -1
         for row in range(0, self.size):
             for col in range(0, self.size):
-                cur = board[row][col]
+                cur = self.squares[row][col]
                 if cur != -1:
                     proper_row = (cur - 1) / self.size
                     proper_col = (cur - 1) % self.size
@@ -232,103 +241,69 @@ class Puzzle:
 
     #should return the sum of the distance to this node
     #plus the heuristic
-    def f(self, squares, g, num_h):
+    def f(self, g, num_h):
         h = 0
         if num_h == 1:
-            h = self.h1(squares)
+            h = self.h1()
         if num_h == 2:
-            h = self.h2(squares)
+            h = self.h2()
         #insert h3
 
-        return g + h + 1
+        return g + h
 
     #A* algorithm, takes a starting point and integer 1,2, or 3
     #that defines the heuristic to use
     def search(self, num_h):
         #use to ensure we don't enter an infinte loop
         past_states = []
-        #priorityQueue
-        heap = []  #f(n), squares, g(n)
+        #priorityQueue, made g an instance varaible of the board
+        heap = []  #f(n), puzzle object
 
         #inialize
         h = 0
         if num_h == 1:
-            h = self.h1(self.squares)
+            h = self.h1()
         if num_h == 2:
-            h = self.h2(self.squares)
+            h = self.h2()
 
-        init_heap_tuple = (h, self.squares, 0)
+        init_heap_tuple = (h, self)
         heappush(heap, init_heap_tuple)
-        print heap
         #while there's stuff in the heap
         test = 0
         while heap:
-            test += 1
-            # if test > 3:
-            #     break
             best_move = heappop(heap)
-            # print "Best: "
-            # pretty_print_2(self.size, best_move[1])
-            self.squares = best_move[1]
-            # self.pretty_print()
+            
+            #output
+            print "Best: "
+            best_move[1].pretty_print()
+            time.sleep(2)
+            #end output
+            
             if self.squares == self.my_goal:
                 return True
             else:
-                moves = self.get_moves(self.squares)
-                # for move in moves:
-                #     print "child: "
-                #     pretty_print_2(self.size, move)
-                for move in moves:
-                    heappush(heap, (self.f(move, best_move[2], num_h), move,
-                                    best_move[2] + 1))
-
+                sucessors = self.get_moves()
+                
+                #output
+                count = 0
+                for s in sucessors:
+                    count += 1
+                    print 'the ', count, ' sucessor is:'
+                    s.pretty_print()
+                    time.sleep(2)
+                #end output
+                
+                for s in sucessors:
+                    #want to call f on move here, since that is the sucessor node we are adding
+                    s.g += self.g + 1
+                    heappush(heap, (s.f(s.g, num_h), s))
+                    
+        #if heap empties, then we have failed
         return False
 
 
 ##testing
-
-#why are these the same???
 puzzle = Puzzle(3)
-puzzle.pretty_print()
-#this will always be odd now
-print 'invariant', puzzle.invariant()
+puzzle.search(1)
 
-# puzzle.pretty_print_2(puzzlright()[1])
-# puzzle.pretty_print_2(puzzle.left()[1])
-# puzzle.pretty_print_2(puzzle.up()[1])
-# puzzle.pretty_print_2(puzzle.down()[1])
 
-puzzle.search(2)
-# puzzle1 = Puzzle(4)
-# puzzle.pretty_print()
-
-# counter1 = 0
-# counter2 = 0
-# counter3 = 0
-# counter4 = 0
-# counter5 = 0
-# counter6 = 0
-# counter7 = 0
-# counter8 = 0
-#why does this create the same puzzle 10,000 times instead of 10,000 different puzzles?
-# for i in range(10000):
-#     puzzle = Puzzle(3)
-#     puzzle.pretty_print()
-#     if puzzle.find_board_parity() == 1:
-#         counter1 +=1
-#     if puzzle.find_board_parity() == 2:
-#         counter2 +=1
-#     if puzzle.find_board_parity() == 3:
-#         counter3 +=1
-#     if puzzle.find_board_parity() == 4:
-#         counter4 +=1
-#     if puzzle.find_board_parity() == 5:
-#         counter5 +=1
-#     if puzzle.find_board_parity() == 6:
-#         counter6 +=1
-#     if puzzle.find_board_parity() == 7:
-#         counter7 +=1
-#     if puzzle.find_board_parity() == 8:
-#         counter8 +=1
-#
-# print counter1, counter2, counter3, counter4, counter5, counter6, counter7, counter8,
