@@ -1,14 +1,23 @@
 import random
-import heapq
+from heapq import heappush, heappop
 
 
 class Puzzle:
 
     squares = []
     size = -1
+    my_goal = []
 
     def __init__(self, size):
         self.size = size
+        count = 1
+        for i in range(0, size):
+            my_row = []
+            for j in range(0, size):
+                my_row.append(count)
+                count += 1
+            self.my_goal.append(my_row)
+
         so_far = []
         cur = -1
         taxi_cab = -1
@@ -161,6 +170,24 @@ class Puzzle:
             print " "
         print ""
 
+    #returns a list of legal square states
+    def get_moves(self, state):
+        #returns a list of possible new puzzles
+        legal_moves = []
+        move = self.right()
+        if move[0]:
+            legal_moves.append(move[1])
+        move = self.left()
+        if move[0]:
+            legal_moves.append(move[1])
+        move = self.up()
+        if move[0]:
+            legal_moves.append(move[1])
+        move = self.down()
+        if move[0]:
+            legal_moves.append(move[1])
+        return legal_moves
+
     def h1(self, board):
         count = 0
         cur = -1
@@ -186,24 +213,6 @@ class Puzzle:
                     count += abs(proper_col - col)
         return count
 
-    #returns a list of legal square states
-    def get_moves(self, state):
-        #returns a list of possible new puzzles
-        legal_moves = []
-        move = right(self)
-        if move[0]:
-            legal_moves.append(move[1])
-        move = left(self)
-        if move[0]:
-            legal_moves.append(move[1])
-        move = up(self)
-        if move[0]:
-            legal_moves.append(move[1])
-        move = down(self)
-        if move[0]:
-            legal_moves.append(move[1])
-        return legal_moves
-
     #should return the sum of the distance to this node
     #plus the heuristic
     def f(self, heap_tuple, num_h):
@@ -211,9 +220,9 @@ class Puzzle:
         g = heap_tuple[2]
         h = 0
         if num_h == 1:
-            h = h1(squares)
+            h = self.h1(squares)
         if num_h == 2:
-            h = h2(squares)
+            h = self.h2(squares)
         #insert h3
 
         return g + h + 1
@@ -229,9 +238,9 @@ class Puzzle:
         #inialize
         h = 0
         if num_h == 1:
-            h = h1(squares)
+            h = self.h1(self.squares)
         if num_h == 2:
-            h = h2(squares)
+            h = self.h2(self.squares)
 
         init_heap_tuple = (h, self.squares, 0)
         heappush(heap, init_heap_tuple)
@@ -240,13 +249,14 @@ class Puzzle:
         while heap:
             best_move = heappop(heap)
             self.squares = best_move[1]
-            if self.squares == my_goal:
+            self.pretty_print()
+            if self.squares == self.my_goal:
                 return True
             else:
-                for move in get_moves():
-                    heappush(
-                        heap,
-                        (f(best_move, num_h), self.squares, best_move[2] + 1))
+                moves = self.get_moves(self.squares)
+                for move in moves:
+                    heappush(heap, (self.f(best_move, num_h), self.squares,
+                                    best_move[2] + 1))
 
         return False
 
@@ -258,6 +268,8 @@ puzzle = Puzzle(3)
 puzzle.pretty_print()
 #this will always be odd now
 print 'invariant', puzzle.invariant()
+
+puzzle.search(1)
 # puzzle1 = Puzzle(4)
 # puzzle.pretty_print()
 
