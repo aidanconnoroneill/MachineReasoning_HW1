@@ -6,7 +6,6 @@ class Puzzle:
 
     squares = []
     size = -1
-    
 
     def __init__(self, size):
         self.size = size
@@ -119,37 +118,41 @@ class Puzzle:
         for row in range(0, self.size - 1):
             for col in range(0, self.size):
                 if (self.squares[row][col] == -1):
-                    self.squares[row][col] = self.squares[row + 1][col]
-                    self.squares[row + 1][col] = -1
-                    return True
-        return False
+                    ans = self.squares
+                    ans[row][col] = ans[row + 1][col]
+                    ans[row + 1][col] = -1
+                    return (True, ans)
+        return (False, self.squares)
 
     def up(self):
         for row in range(1, self.size):
             for col in range(0, self.size):
                 if (self.squares[row][col] == -1):
-                    self.squares[row][col] = self.squares[row - 1][col]
-                    self.squares[row - 1][col] = -1
-                    return True
-        return False
+                    ans = self.squares
+                    ans[row][col] = ans[row - 1][col]
+                    ans[row - 1][col] = -1
+                    return (True, ans)
+        return (False, self.squares)
 
     def left(self):
         for row in range(0, self.size):
             for col in range(1, self.size):
                 if (self.squares[row][col] == -1):
-                    self.squares[row][col] = self.squares[row][col - 1]
-                    self.squares[row][col - 1] = -1
-                    return True
-        return False
+                    ans = self.squares
+                    ans[row][col] = ans[row][col - 1]
+                    ans[row][col - 1] = -1
+                    return (True, ans)
+        return (False, self.squares)
 
     def right(self):
         for row in range(0, self.size):
             for col in range(0, self.size - 1):
                 if (self.squares[row][col] == -1):
-                    self.squares[row][col] = self.squares[row][col + 1]
-                    self.squares[row][col + 1] = -1
-                    return True
-        return False
+                    ans = self.squares
+                    ans[row][col] = ans[row][col + 1]
+                    ans[row][col + 1] = -1
+                    return (True, ans)
+        return (False, self.squares)
 
     def pretty_print(self):
         for row in range(0, self.size):
@@ -183,56 +186,71 @@ class Puzzle:
                     count += abs(proper_col - col)
         return count
 
-    def get_moves(self):
+    #returns a list of legal square states
+    def get_moves(self, state):
         #returns a list of possible new puzzles
         legal_moves = []
-        if right(self):
-            legal_moves.append(right(self))
-        if left(self):
-            legal_moves.append(left(self))
-        if up(self):
-            legal_moves.append(up(self))
-        if down(self):
-            legal_moves.append(down(self)
+        move = right(self)
+        if move[0]:
+            legal_moves.append(move[1])
+        move = left(self)
+        if move[0]:
+            legal_moves.append(move[1])
+        move = up(self)
+        if move[0]:
+            legal_moves.append(move[1])
+        move = down(self)
+        if move[0]:
+            legal_moves.append(move[1])
         return legal_moves
-        
+
     #should return the sum of the distance to this node
     #plus the heuristic
-    def f(self):
-        return 5
-        
-    def update_frontier (self):
-        for move in get_moves(self):
-            if heuristic == 1:
-                heappush(heap, f(move), move, ))
-            elif heuristic == 2:
-                heappush(heap, f(move), move))
-            #for when we implement the third heuristic
-            elif heuristic == 3:
-                #heappush(heap, f(move), move))
-            else 
-                raise ValueError('invalid heuristic number')
-                
-                
+    def f(self, heap_tuple, num_h):
+        squares = heap_tuple[1]
+        g = heap_tuple[2]
+        h = 0
+        if num_h == 1:
+            h = h1(squares)
+        if num_h == 2:
+            h = h2(squares)
+        #insert h3
+
+        return g + h + 1
+
     #A* algorithm, takes a starting point and integer 1,2, or 3
     #that defines the heuristic to use
     def search(self, num_h):
         #use to ensure we don't enter an infinte loop
         past_states = []
         #priorityQueue
-        heap = []
-        
+        heap = []  #f(n), squares, g(n)
+
         #inialize
-        heappush((heap, f(self)))
-        
+        h = 0
+        if num_h == 1:
+            h = h1(squares)
+        if num_h == 2:
+            h = h2(squares)
+
+        init_heap_tuple = (h, self.squares, 0)
+        heappush(heap, init_heap_tuple)
+
         #while there's stuff in the heap
         while heap:
-            state = heappop(heap)
-            if state == my_goal:
+            best_move = heappop(heap)
+            self.squares = best_move[1]
+            if self.squares == my_goal:
                 return True
-            else 
-                update_frontier(state)
-         return False   
+            else:
+                for move in get_moves():
+                    heappush(
+                        heap,
+                        (f(best_move, num_h), self.squares, best_move[2] + 1))
+
+        return False
+
+
 ##testing
 
 #why are these the same???
