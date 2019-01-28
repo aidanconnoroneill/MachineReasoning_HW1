@@ -192,19 +192,15 @@ class Puzzle:
         legal_moves = []
         move = right(self.size, copy.deepcopy(state))
         if move[0]:
-            print 'here, right'
             legal_moves.append(move[1])
         move = left(self.size, state)
         if move[0]:
-            print 'here, left'
             legal_moves.append(move[1])
         move = up(self.size, state)
         if move[0]:
-            print 'here, up'
             legal_moves.append(move[1])
         move = down(self.size, state)
         if move[0]:
-            print 'here, down'
             legal_moves.append(move[1])
 
         return legal_moves
@@ -236,9 +232,7 @@ class Puzzle:
 
     #should return the sum of the distance to this node
     #plus the heuristic
-    def f(self, heap_tuple, num_h):
-        squares = heap_tuple[1]
-        g = heap_tuple[2]
+    def f(self, squares, g, num_h):
         h = 0
         if num_h == 1:
             h = self.h1(squares)
@@ -267,21 +261,25 @@ class Puzzle:
         heappush(heap, init_heap_tuple)
         print heap
         #while there's stuff in the heap
+        test = 0
         while heap:
+            test += 1
+            # if test > 3:
+            #     break
             best_move = heappop(heap)
+            # print "Best: "
+            # pretty_print_2(self.size, best_move[1])
             self.squares = best_move[1]
             # self.pretty_print()
-            pretty_print_2(self.size, self.my_goal)
             if self.squares == self.my_goal:
                 return True
             else:
                 moves = self.get_moves(self.squares)
-                # print moves
                 # for move in moves:
+                #     print "child: "
                 #     pretty_print_2(self.size, move)
-                # quit()
                 for move in moves:
-                    heappush(heap, (self.f(best_move, num_h), self.squares,
+                    heappush(heap, (self.f(move, best_move[2], num_h), move,
                                     best_move[2] + 1))
 
         return False
@@ -300,7 +298,7 @@ print 'invariant', puzzle.invariant()
 # puzzle.pretty_print_2(puzzle.up()[1])
 # puzzle.pretty_print_2(puzzle.down()[1])
 
-puzzle.search(1)
+puzzle.search(2)
 # puzzle1 = Puzzle(4)
 # puzzle.pretty_print()
 
