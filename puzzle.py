@@ -16,11 +16,51 @@ def pretty_print_2(size, board):
 
 class Puzzle:
 
-    squares = []
-    size = -1
-    my_goal = []
-    g = 0
-    
+    def __init__(self, size):
+        #create instances variables
+        #fucking important to have these in here and not in the class definition
+        #fucks everything up
+        self.size = size
+        self.squares = []
+        self.my_goal = []
+        self.g = 0
+        
+        
+        count = 1
+        for i in range(0, size):
+            my_row = []
+            for j in range(0, size):
+                if (i == size - 1 and j == size - 1):
+                    my_row.append(-1)
+                else:
+                    my_row.append(count)
+                count += 1
+            self.my_goal.append(my_row)
+
+        so_far = []
+        cur = -1
+        taxi_cab = -1
+        for i in range(0, size):
+            my_row = []
+            for j in range(0, size):
+                while True:
+                    cur = random.randint(0, size * size - 1)
+                    if not cur in so_far:
+                        break
+                so_far.append(cur)
+                if cur != 0:
+                    my_row.append(cur)
+                else:
+                    my_row.append(-1)
+                    # taxi_cab = size - i + size - j - 2
+                    # print "taxi cab: "
+                    # print taxi_cab
+            self.squares.append(my_row)
+        #ensures we have an (odd) solvable puzzle
+        if self.invariant() % 2 == 0:
+            self.switch_not_blank()
+            
+            
     #movement methods return a touple of the boolean sucess of the move
     #and a new puzzle *object*, if possible
     def down(self):
@@ -66,41 +106,7 @@ class Puzzle:
                     return (True, ans)
         return (False, self)
 
-    def __init__(self, size):
-        self.size = size
-        count = 1
-        for i in range(0, size):
-            my_row = []
-            for j in range(0, size):
-                if (i == size - 1 and j == size - 1):
-                    my_row.append(-1)
-                else:
-                    my_row.append(count)
-                count += 1
-            self.my_goal.append(my_row)
-
-        so_far = []
-        cur = -1
-        taxi_cab = -1
-        for i in range(0, size):
-            my_row = []
-            for j in range(0, size):
-                while True:
-                    cur = random.randint(0, size * size - 1)
-                    if not cur in so_far:
-                        break
-                so_far.append(cur)
-                if cur != 0:
-                    my_row.append(cur)
-                else:
-                    my_row.append(-1)
-                    # taxi_cab = size - i + size - j - 2
-                    # print "taxi cab: "
-                    # print taxi_cab
-            self.squares.append(my_row)
-        #ensures we have an (odd) solvable puzzle
-        if self.invariant() % 2 == 0:
-            self.switch_not_blank()
+    
 
     #returns the number of cycles of the board
     def board_parity(self):
@@ -183,8 +189,6 @@ class Puzzle:
             self.squares[1][0] = self.squares[1][1]
             self.squares[1][1] = store
 
-    def get_state(self):
-        return self.squares
 
     def pretty_print(self):
         for row in range(0, self.size):
@@ -193,11 +197,13 @@ class Puzzle:
             print " "
         print ""
 
-    #returns a list of legal square states
+    #returns a list of legal square states, full puzzle object is passed
     def get_moves(self):
         #returns a list of possible moves, in the form of puzzle objects
+        
         legal_moves = []
         move = self.right()
+        
         #tests the boolean return
         if move[0]:
             #adds the changed board
@@ -211,7 +217,7 @@ class Puzzle:
         move = self.down()
         if move[0]:
             legal_moves.append(move[1])
-
+        
         return legal_moves
 
     def h1(self):
@@ -239,17 +245,6 @@ class Puzzle:
                     count += abs(proper_col - col)
         return count
 
-    #should return the sum of the distance to this node
-    #plus the heuristic
-    def f(self, g, num_h):
-        h = 0
-        if num_h == 1:
-            h = self.h1()
-        if num_h == 2:
-            h = self.h2()
-        #insert h3
-
-        return g + h
 
     #A* algorithm, takes a starting point and integer 1,2, or 3
     #that defines the heuristic to use
@@ -269,34 +264,31 @@ class Puzzle:
         init_heap_tuple = (h, self)
         heappush(heap, init_heap_tuple)
         #while there's stuff in the heap
-        test = 0
+        count = 0
         while heap:
+            
             best_move = heappop(heap)
-            
-            #output
-            print "Best: "
-            best_move[1].pretty_print()
-            time.sleep(2)
-            #end output
-            
+            #print 'current state (path length', best_move[1].g, ') is: \n'
+            #best_move[1].pretty_print()
+            count += 1
+            if count %1000 == 0:
+                print best_move[1].g
             if self.squares == self.my_goal:
+                for i in range(10):
+                    print' DING DING DING DING: YOU INVENTED A NEW SENTIENCE!!!'
+                    time.sleep(1)
                 return True
             else:
-                sucessors = self.get_moves()
-                
-                #output
-                count = 0
+                sucessors = best_move[1].get_moves()                
                 for s in sucessors:
-                    count += 1
-                    print 'the ', count, ' sucessor is:'
-                    s.pretty_print()
-                    time.sleep(2)
-                #end output
-                
-                for s in sucessors:
-                    #want to call f on move here, since that is the sucessor node we are adding
-                    s.g += self.g + 1
-                    heappush(heap, (s.f(s.g, num_h), s))
+                    #increase path distances
+                    s.g = best_move[1].g + 1
+                    if num_h ==1:
+                        heappush(heap, (s.g + s.h2(), s))
+                    if num_h ==2:
+                        heappush(heap,(s.g + s.h2(), s))
+                    #if num_h == 3:
+                        #heappush(heap, (s.g + s.h3(), s))
                     
         #if heap empties, then we have failed
         return False
@@ -304,6 +296,10 @@ class Puzzle:
 
 ##testing
 puzzle = Puzzle(3)
-puzzle.search(1)
+puzzle.search(2)
+
+
+
+
 
 
