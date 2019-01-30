@@ -275,7 +275,7 @@ class Puzzle:
 
             best_move = heappop(heap)
             if best_move[1].squares == self.my_goal:
-                print 'goal state reached, path length = ', best_move[1].g
+                # print 'goal state reached, path length = ', best_move[1].g
                 return (True, best_move[1].g, count)
             else:
                 sucessors = best_move[1].get_moves()
@@ -302,15 +302,16 @@ class Puzzle:
 ##testing
 
 results = {}
-results[16] = (0, 0)
+results[20] = (0, 0)
 while (True):
-    puzzle = Puzzle(3, 28)
+    puzzle = Puzzle(3, 30)
     result = puzzle.search(1)
     depth = result[1]
-    if depth != 16:
+    if depth != 20:
         continue
     node = result[2]
     times_solved = results[depth][0]
+    print times_solved
     if times_solved < 50:
         total_node_count = results[depth][1]
         entry = {depth: (times_solved + 1, total_node_count + node)}

@@ -266,7 +266,6 @@ class Puzzle:
 
             best_move = heappop(heap)
             if best_move[1].squares == self.my_goal:
-                print 'goal state reached, path length = ', best_move[1].g
                 return (True, best_move[1].g, count)
             else:
                 sucessors = best_move[1].get_moves()
@@ -292,27 +291,21 @@ class Puzzle:
 
 ##testing
 results = {}
-for i in range(20, 25):
-    if (i % 2 == 0):
-        results[i] = (0, 0)  ###num solutions, avg_nodes
+results[24] = (0, 0)
 while (True):
     puzzle = Puzzle(3)
     result = puzzle.search(1)
     depth = result[1]
-    if (depth != 22) or (depth != 20) or depth != 24:
+    if depth != 24 or depth != 22:
         continue
     node = result[2]
     times_solved = results[depth][0]
-    if times_solved < 100:
+    print times_solved
+    if times_solved < 50:
         total_node_count = results[depth][1]
         entry = {depth: (times_solved + 1, total_node_count + node)}
         results.update(entry)
-    flag = True
-    for i in range(20, 25):
-        if (i % 2 == 0 and results[i][0] < 100):
-            flag = False
-            break
-    if flag:
-        # print 'h1'
+    else:
         print results
+        print 'h1'
         break
