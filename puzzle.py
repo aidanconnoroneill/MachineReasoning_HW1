@@ -278,7 +278,7 @@ class Puzzle:
                         s.g = best_move[1].g + 1
 
                         if num_h == 1:
-                            heappush(heap, (s.g + s.h2(), s))
+                            heappush(heap, (s.g + s.h1(), s))
                         if num_h == 2:
                             heappush(heap, (s.g + s.h2(), s))
                         #if num_h == 3:
@@ -292,14 +292,14 @@ class Puzzle:
 
 ##testing
 results = {}
-for i in range(2, 25):
+for i in range(20, 25):
     if (i % 2 == 0):
         results[i] = (0, 0)  ###num solutions, avg_nodes
 while (True):
     puzzle = Puzzle(3)
-    result = puzzle.search(2)
+    result = puzzle.search(1)
     depth = result[1]
-    if depth % 2 == 1 or depth > 24:
+    if (depth != 22) or (depth != 20) or depth != 24:
         continue
     node = result[2]
     times_solved = results[depth][0]
@@ -308,10 +308,11 @@ while (True):
         entry = {depth: (times_solved + 1, total_node_count + node)}
         results.update(entry)
     flag = True
-    for i in range(2, 25):
+    for i in range(20, 25):
         if (i % 2 == 0 and results[i][0] < 100):
             flag = False
             break
     if flag:
+        # print 'h1'
         print results
         break
