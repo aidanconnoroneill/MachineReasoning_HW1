@@ -274,31 +274,12 @@ class Puzzle:
         while heap:
             
             best_move = heappop(heap)
-            print 'next best move is: '
-            best_move[1].pretty_print()
-            #time.sleep(.1)
-            #print every thousand searches
-            count += 1
-            if count >= 362880:
-                print 'we have checked more than the number of possible board states'
-            #if count %1000 == 0:
-            #     print best_move[1].g
             if best_move[1].squares == self.my_goal:
-                for i in range(10):
-                    print' DING DING DING DING: YOU INVENTED A NEW SENTIENCE!!!'
-                    time.sleep(1)
+                print 'goal state reached, path length = ', best_move[1].g
                 return True
             else:
                 sucessors = best_move[1].get_moves()                
                 for s in sucessors:
-                    #print 'sucessor is: '
-                    #s.pretty_print()
-                    #time.sleep(2)
-                    #print 'linearize s.squares is ', linearize(s.squares)
-                    #time.sleep(2)
-                    print 'the invarient number is: ', s.invariant()
-                    if linearize(s.squares) in past_states:
-                        print 'already visited'
                     if linearize(s.squares) not in past_states:
                         past_states.add(linearize(s.squares))
                         #print'sucessor is: '
@@ -321,7 +302,7 @@ class Puzzle:
 
 ##testing
 puzzle = Puzzle(3)
-print puzzle.search(1)
+puzzle.search(1)
 
 
 
