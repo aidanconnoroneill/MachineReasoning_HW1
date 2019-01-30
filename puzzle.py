@@ -11,6 +11,12 @@ def pretty_print_2(size, board):
         print " "
     print ""
 
+def linearize(board):
+    a = tuple(board[0])
+    for row in range(1, len(board)):
+            a = a + tuple(board[row])
+    return a
+        
 
 
 
@@ -56,8 +62,8 @@ class Puzzle:
                     # print "taxi cab: "
                     # print taxi_cab
             self.squares.append(my_row)
-        #ensures we have an (odd) solvable puzzle
-        if self.invariant() % 2 == 0:
+        #ensures we have an (even) solvable puzzle
+        if self.invariant() % 2 != 0:
             self.switch_not_blank()
             
             
@@ -244,13 +250,13 @@ class Puzzle:
                     count += abs(proper_row - row)
                     count += abs(proper_col - col)
         return count
-
-
+           
     #A* algorithm, takes a starting point and integer 1,2, or 3
     #that defines the heuristic to use
     def search(self, num_h):
         #use to ensure we don't enter an infinte loop
-        past_states = []
+        #set
+        past_states = {linearize(self.squares)}
         #priorityQueue, made g an instance varaible of the board
         heap = []  #f(n), puzzle object
 
@@ -268,12 +274,16 @@ class Puzzle:
         while heap:
             
             best_move = heappop(heap)
-            #print 'current state (path length', best_move[1].g, ') is: \n'
-            #best_move[1].pretty_print()
+            print 'next best move is: '
+            best_move[1].pretty_print()
+            #time.sleep(.1)
+            #print every thousand searches
             count += 1
-            if count %1000 == 0:
-                print best_move[1].g
-            if self.squares == self.my_goal:
+            if count >= 362880:
+                print 'we have checked more than the number of possible board states'
+            #if count %1000 == 0:
+            #     print best_move[1].g
+            if best_move[1].squares == self.my_goal:
                 for i in range(10):
                     print' DING DING DING DING: YOU INVENTED A NEW SENTIENCE!!!'
                     time.sleep(1)
@@ -281,22 +291,42 @@ class Puzzle:
             else:
                 sucessors = best_move[1].get_moves()                
                 for s in sucessors:
-                    #increase path distances
-                    s.g = best_move[1].g + 1
-                    if num_h ==1:
-                        heappush(heap, (s.g + s.h2(), s))
-                    if num_h ==2:
-                        heappush(heap,(s.g + s.h2(), s))
-                    #if num_h == 3:
-                        #heappush(heap, (s.g + s.h3(), s))
-                    
+                    #print 'sucessor is: '
+                    #s.pretty_print()
+                    #time.sleep(2)
+                    #print 'linearize s.squares is ', linearize(s.squares)
+                    #time.sleep(2)
+                    print 'the invarient number is: ', s.invariant()
+                    if linearize(s.squares) in past_states:
+                        print 'already visited'
+                    if linearize(s.squares) not in past_states:
+                        past_states.add(linearize(s.squares))
+                        #print'sucessor is: '
+                        #s.pretty_print()
+                        #time.sleep(1)
+                        s.g = best_move[1].g + 1
+                        
+                        if num_h ==1:
+                            heappush(heap, (s.g + s.h2(), s))
+                        if num_h ==2:
+                            heappush(heap,(s.g + s.h2(), s))
+                        #if num_h == 3:
+                            #heappush(heap, (s.g + s.h3(), s))
+            if not heap:
+                best_move[1].pretty_print()
         #if heap empties, then we have failed
+        
         return False
 
 
 ##testing
 puzzle = Puzzle(3)
-puzzle.search(2)
+print puzzle.search(1)
+
+
+
+
+
 
 
 
