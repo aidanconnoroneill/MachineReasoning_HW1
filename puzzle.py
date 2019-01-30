@@ -291,20 +291,21 @@ class Puzzle:
 
 ##testing
 results = {}
-results[24] = (0, 0)
+results[20] = (0, 0)
 while (True):
     puzzle = Puzzle(3)
     result = puzzle.search(1)
     depth = result[1]
-    if depth != 24 or depth != 22:
+    if depth != 20:
         continue
     node = result[2]
     times_solved = results[depth][0]
     print times_solved
-    if times_solved < 50:
+    if times_solved < 22:
         total_node_count = results[depth][1]
         entry = {depth: (times_solved + 1, total_node_count + node)}
         results.update(entry)
+        print results
     else:
         print results
         print 'h1'
