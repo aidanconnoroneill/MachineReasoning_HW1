@@ -11,17 +11,15 @@ def pretty_print_2(size, board):
         print " "
     print ""
 
+
 def linearize(board):
     a = tuple(board[0])
     for row in range(1, len(board)):
-            a = a + tuple(board[row])
+        a = a + tuple(board[row])
     return a
-        
-
 
 
 class Puzzle:
-
     def __init__(self, size):
         #create instances variables
         #fucking important to have these in here and not in the class definition
@@ -30,8 +28,7 @@ class Puzzle:
         self.squares = []
         self.my_goal = []
         self.g = 0
-        
-        
+
         count = 1
         for i in range(0, size):
             my_row = []
@@ -65,8 +62,7 @@ class Puzzle:
         #ensures we have an (even) solvable puzzle
         if self.invariant() % 2 != 0:
             self.switch_not_blank()
-            
-            
+
     #movement methods return a touple of the boolean sucess of the move
     #and a new puzzle *object*, if possible
     def down(self):
@@ -79,7 +75,6 @@ class Puzzle:
                     return (True, ans)
         return (False, self)
 
-
     def up(self):
         for row in range(1, self.size):
             for col in range(0, self.size):
@@ -89,7 +84,6 @@ class Puzzle:
                     ans.squares[row - 1][col] = -1
                     return (True, ans)
         return (False, self)
-
 
     def left(self):
         for row in range(0, self.size):
@@ -101,7 +95,6 @@ class Puzzle:
                     return (True, ans)
         return (False, self)
 
-
     def right(self):
         for row in range(0, self.size):
             for col in range(0, self.size - 1):
@@ -111,8 +104,6 @@ class Puzzle:
                     ans.squares[row][col + 1] = -1
                     return (True, ans)
         return (False, self)
-
-    
 
     #returns the number of cycles of the board
     def board_parity(self):
@@ -174,7 +165,8 @@ class Puzzle:
     #returns the taxicab distance of the blank
     #from the lower right corner
     def taxicab(self):
-        return (self.size - 1 * - self.find_blank()[0]) - (self.size-1 - self.find_blank()[1])
+        return (self.size - 1 * -self.find_blank()[0]) - (
+            self.size - 1 - self.find_blank()[1])
 
     #returns the invariant number associatied with
     #the board
@@ -195,7 +187,6 @@ class Puzzle:
             self.squares[1][0] = self.squares[1][1]
             self.squares[1][1] = store
 
-
     def pretty_print(self):
         for row in range(0, self.size):
             for col in range(0, self.size):
@@ -206,10 +197,10 @@ class Puzzle:
     #returns a list of legal square states, full puzzle object is passed
     def get_moves(self):
         #returns a list of possible moves, in the form of puzzle objects
-        
+
         legal_moves = []
         move = self.right()
-        
+
         #tests the boolean return
         if move[0]:
             #adds the changed board
@@ -223,7 +214,7 @@ class Puzzle:
         move = self.down()
         if move[0]:
             legal_moves.append(move[1])
-        
+
         return legal_moves
 
     def h1(self):
@@ -250,7 +241,7 @@ class Puzzle:
                     count += abs(proper_row - row)
                     count += abs(proper_col - col)
         return count
-           
+
     #A* algorithm, takes a starting point and integer 1,2, or 3
     #that defines the heuristic to use
     def search(self, num_h):
@@ -270,47 +261,57 @@ class Puzzle:
         init_heap_tuple = (h, self)
         heappush(heap, init_heap_tuple)
         #while there's stuff in the heap
-        count = 0
+        count = 1
         while heap:
-            
+
             best_move = heappop(heap)
             if best_move[1].squares == self.my_goal:
                 print 'goal state reached, path length = ', best_move[1].g
-                return True
+                return (True, best_move[1].g, count)
             else:
-                sucessors = best_move[1].get_moves()                
+                sucessors = best_move[1].get_moves()
                 for s in sucessors:
+                    count += 1
                     if linearize(s.squares) not in past_states:
                         past_states.add(linearize(s.squares))
-                        #print'sucessor is: '
-                        #s.pretty_print()
-                        #time.sleep(1)
+
                         s.g = best_move[1].g + 1
-                        
-                        if num_h ==1:
+
+                        if num_h == 1:
                             heappush(heap, (s.g + s.h2(), s))
-                        if num_h ==2:
-                            heappush(heap,(s.g + s.h2(), s))
+                        if num_h == 2:
+                            heappush(heap, (s.g + s.h2(), s))
                         #if num_h == 3:
-                            #heappush(heap, (s.g + s.h3(), s))
+                        #heappush(heap, (s.g + s.h3(), s))
             if not heap:
                 best_move[1].pretty_print()
         #if heap empties, then we have failed
-        
-        return False
+
+        return (False, [[]], -1)
 
 
 ##testing
-puzzle = Puzzle(3)
-puzzle.search(1)
-
-
-
-
-
-
-
-
-
-
-
+results = {}
+for i in range(2, 25):
+    if (i % 2 == 0):
+        results[i] = (0, 0)  ###num solutions, avg_nodes
+while (True):
+    puzzle = Puzzle(3)
+    result = puzzle.search(2)
+    depth = result[1]
+    if depth % 2 == 1 or depth > 24:
+        continue
+    node = result[2]
+    times_solved = results[depth][0]
+    if times_solved < 100:
+        total_node_count = results[depth][1]
+        entry = {depth: (times_solved + 1, total_node_count + node)}
+        results.update(entry)
+    flag = True
+    for i in range(2, 25):
+        if (i % 2 == 0 and results[i][0] < 100):
+            flag = False
+            break
+    if flag:
+        print results
+        break
