@@ -2,6 +2,10 @@
 \section{Results}
 \label{sec:results}
 
+Our results were largely in line with those of Russell and Norvig.  As we can see 
+from Figure 1, \text{h_2} hugely outperforms \text{h_1}, especially as the size
+of the problem grows.  
+
 Present the results of your experiments. Simply presenting the data is
 insufficient! You need to analyze your results. What did you discover?
 What is interesting about your results? Were the results what you
@@ -9,32 +13,12 @@ expected? Use appropriate visualizations. Prefer graphs and charts to
 tables as they are easier to read (though tables are often more
 compact, and can be a better choice if you're squeezed for space).
 
-\subsection{Embedding Pictures}
-\label{subsec:pics}
-
-See the source code (\texttt{results.tex}) for instructions on how to
-insert figures (like figure~\ref{fig:tex}) or plots into your
-document.
-
-% Note that TeX has a mind of its own when it comes to placing images
-% in documents - where a figure appears in the PDF document will often
-% be quite different from where it appears in the source code. This is
-% a feature, not a bug - it enables LaTeX to produce layouts that
-% "flow" better. It only takes a few lines to insert a figure into
-% your write-up - I recommend using PNG, JPG or PDF images
-% (incidentally, programs like Excel and Matlab will allow you to save
-% any plots or figures you generate in those formats). The \figure{}
-% command is used to create a new figure.
-\begin{figure}[htb]
-
-  \centering  % centers the image in the column
-
   % replace the second argument below with your filename. I like to
   % place all my figures in a sub-directory to keep things organized
-  \includegraphics[width=0.47\textwidth]{figs/file_extensions.png}
+  \includegraphics[width=0.47\textwidth]{figs/results.pdf}
 
   % *Every* figure should have a descriptive caption.
-  \caption{On the trustworthiness of \LaTeX. Image courtesy of \texttt{xkcd}.}
+  \caption{Figure 1}
 
   % The label is a handle you create so that you can refer to this
   % figure (using the \ref{} command) from other parts of your
