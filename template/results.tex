@@ -1,0 +1,64 @@
+
+\section{Results}
+\label{sec:results}
+
+Our results were largely in line with those of Russell and Norvig.  As we can see 
+from Figure 1, \text{h_2} hugely outperforms \text{h_1}, especially as the size
+of the problem grows.  
+
+Present the results of your experiments. Simply presenting the data is
+insufficient! You need to analyze your results. What did you discover?
+What is interesting about your results? Were the results what you
+expected? Use appropriate visualizations. Prefer graphs and charts to
+tables as they are easier to read (though tables are often more
+compact, and can be a better choice if you're squeezed for space).
+
+  % replace the second argument below with your filename. I like to
+  % place all my figures in a sub-directory to keep things organized
+  \includegraphics[width=0.47\textwidth]{figs/results.pdf}
+
+  % *Every* figure should have a descriptive caption.
+  \caption{Figure 1}
+
+  % The label is a handle you create so that you can refer to this
+  % figure (using the \ref{} command) from other parts of your
+  % document. LaTeX automatically renumbers figures and updates
+  % references when you recompile, so you should do it this way rather
+  % than hard-coding in references. Notice that I've also been
+  % creating labels for the various sections in the document; I could
+  % use \ref{} command to refer to those sections using their labels
+  % too.
+  \label{fig:tex}
+
+\end{figure}
+
+\subsection{Creating Tables}
+\label{subsec:tables}
+
+Again, refer to \texttt{results.tex} to learn how to create simple
+tables (like table~\ref{tab:example}).
+\begin{figure}[htb]
+  \centering % centers the entire table
+
+  % The following line sets the parameters of the table: we'll have
+  % three columns (one per 'c'), each
+  % column will be centered (hence the 'c'; 'l' or 'r' will left or
+  % right justify the column) and the columns
+  % will have lines between them (that's the purpose of the |s between
+  % the 'c's).
+  \begin{tabular}{|c|c|c|} 
+    \hline \hline % draws two horizontal lines at the top of the table
+    Column 1 & Column 2 & Column 3 \\ % separate column contents using the &
+    \hline % line after the column headers
+    $1$ & $3.1$ & $2.7$ \\
+    $42$ & $-1$ & $1729$\\
+    \hline \hline
+  \end{tabular}
+
+  % As with figures, *every* table should have a descriptive caption
+  % and a label for ease of reference.
+  \caption{An example table.}
+  \label{tab:example}
+
+\end{figure}
+
