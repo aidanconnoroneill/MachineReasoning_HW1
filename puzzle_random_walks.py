@@ -251,6 +251,43 @@ class Puzzle:
                     count += abs(proper_col - col)
         return count
 
+    def h3(self):
+        board = copy.deepcopy(self.squares)
+        count = 0
+        row_b = 0
+        col_b = 0
+        print 'here'
+        while (True):
+            if board == self.my_goal:
+                print self.squares
+                print count
+                return count
+            for row in range(self.size):
+                for col in range(self.size):
+                    if board[row][col] == -1:
+                        row_b = row
+                        col_b = col
+            has_swapped = False
+            if row_b == self.size - 1 and col_b == self.size - 1:
+                for row in range(self.size):
+                    for col in range(self.size):
+                        if board[row][col] != self.size * row + col + 1:
+                            if not has_swapped:
+                                board[row_b][col_b] = board[row][col]
+                                board[row][col] = -1
+                                has_swapped = True
+            else:
+                to_find = row_b * self.size + col + 1
+                for row in range(self.size):
+                    for col in range(self.size):
+                        if board[row][col] == self.size * row_b + col_b + 1:
+                            if not has_swapped:
+                                board[row_b][col_b] = board[row][col]
+                                board[row][col] = -1
+                                has_swapped = True
+            count += 1
+        return count
+
     #A* algorithm, takes a starting point and integer 1,2, or 3
     #that defines the heuristic to use
     def search(self, num_h):
@@ -266,6 +303,8 @@ class Puzzle:
             h = self.h1()
         if num_h == 2:
             h = self.h2()
+        if num_h == 3:
+            h = self.h3()
 
         init_heap_tuple = (h, self)
         heappush(heap, init_heap_tuple)
@@ -280,8 +319,8 @@ class Puzzle:
             else:
                 sucessors = best_move[1].get_moves()
                 for s in sucessors:
-                    count += 1
                     if linearize(s.squares) not in past_states:
+                        count += 1
                         past_states.add(linearize(s.squares))
 
                         s.g = best_move[1].g + 1
@@ -290,8 +329,8 @@ class Puzzle:
                             heappush(heap, (s.g + s.h1(), s))
                         if num_h == 2:
                             heappush(heap, (s.g + s.h2(), s))
-                        #if num_h == 3:
-                        #heappush(heap, (s.g + s.h3(), s))
+                        if num_h == 3:
+                            heappush(heap, (s.g + s.h3(), s))
             if not heap:
                 best_move[1].pretty_print()
         #if heap empties, then we have failed
@@ -302,12 +341,14 @@ class Puzzle:
 ##testing
 
 results = {}
-results[20] = (0, 0)
+for i in range(10, 25):
+    if i % 2 == 0:
+        results[i] = (0, 0)
 while (True):
     puzzle = Puzzle(3, 30)
-    result = puzzle.search(1)
+    result = puzzle.search(3)
     depth = result[1]
-    if depth != 20:
+    if depth % 2 != 0 or depth > 24:
         continue
     node = result[2]
     times_solved = results[depth][0]
@@ -316,6 +357,8 @@ while (True):
         total_node_count = results[depth][1]
         entry = {depth: (times_solved + 1, total_node_count + node)}
         results.update(entry)
+        print results
+        print 'h1'
     else:
         print results
         print 'h1'
