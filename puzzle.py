@@ -242,6 +242,43 @@ class Puzzle:
                     count += abs(proper_col - col)
         return count
 
+    def h3(self):
+        board = copy.deepcopy(self.squares)
+        count = 0
+        row_b = 0
+        col_b = 0
+        print 'here'
+        while (True):
+            if board == self.my_goal:
+                print self.squares
+                print count
+                return count
+            for row in range(self.size):
+                for col in range(self.size):
+                    if board[row][col] == -1:
+                        row_b = row
+                        col_b = col
+            has_swapped = False
+            if row_b == self.size - 1 and col_b == self.size - 1:
+                for row in range(self.size):
+                    for col in range(self.size):
+                        if board[row][col] != self.size * row + col + 1:
+                            if not has_swapped:
+                                board[row_b][col_b] = board[row][col]
+                                board[row][col] = -1
+                                has_swapped = True
+            else:
+                to_find = row_b * self.size + col + 1
+                for row in range(self.size):
+                    for col in range(self.size):
+                        if board[row][col] == self.size * row_b + col_b + 1:
+                            if not has_swapped:
+                                board[row_b][col_b] = board[row][col]
+                                board[row][col] = -1
+                                has_swapped = True
+            count += 1
+        return count
+
     #A* algorithm, takes a starting point and integer 1,2, or 3
     #that defines the heuristic to use
     def search(self, num_h):
@@ -253,10 +290,13 @@ class Puzzle:
 
         #inialize
         h = 0
+        print num_h
         if num_h == 1:
             h = self.h1()
         if num_h == 2:
             h = self.h2()
+        if num_h == 3:
+            h = self.h3()
 
         init_heap_tuple = (h, self)
         heappush(heap, init_heap_tuple)
@@ -280,6 +320,8 @@ class Puzzle:
                             heappush(heap, (s.g + s.h1(), s))
                         if num_h == 2:
                             heappush(heap, (s.g + s.h2(), s))
+                        if num_h == 3:
+                            heappush(heap, (s.g + s.h3(), s))
                         #if num_h == 3:
                         #heappush(heap, (s.g + s.h3(), s))
             if not heap:
@@ -294,7 +336,7 @@ results = {}
 results[20] = (0, 0)
 while (True):
     puzzle = Puzzle(3)
-    result = puzzle.search(1)
+    result = puzzle.search(3)
     depth = result[1]
     if depth != 20:
         continue
@@ -308,5 +350,4 @@ while (True):
         print results
     else:
         print results
-        print 'h1'
         break
