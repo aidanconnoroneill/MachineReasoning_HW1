@@ -1,9 +1,11 @@
 import random
 import copy
 from heapq import heappush, heappop
-import time
 
 
+###Helper function outside of the class definition that takes a board
+###and prints it out.
+###Outside of the class definition
 def pretty_print_2(size, board):
     for row in range(0, size):
         for col in range(0, size):
@@ -12,6 +14,9 @@ def pretty_print_2(size, board):
     print ""
 
 
+###Creates a tuple out of a board represented as a list of lists.
+###This is helpful as a tuple is hashable.
+###Outside of the class definition
 def linearize(board):
     a = tuple(board[0])
     for row in range(1, len(board)):
@@ -22,13 +27,11 @@ def linearize(board):
 class Puzzle:
     def __init__(self, size, num_moves):
         #create instances variables
-        #fucking important to have these in here and not in the class definition
-        #fucks everything up
-        self.size = size
-        self.squares = []
-        self.my_goal = []
-        self.g = 0
-
+        self.size = size  #size of the board
+        self.squares = []  #board state
+        self.my_goal = []  #solved state
+        self.g = 0  #length of path
+        #Create the starting state and the goal state
         count = 1
         for i in range(0, size):
             my_row = []
@@ -43,6 +46,8 @@ class Puzzle:
                 count += 1
             self.my_goal.append(my_row)
             self.squares.append(my_row)
+        ###Randomly mvoe the blank num_moves times to create a pseudo-random
+        ###starting state.  Checks to make sure that the puzzle doesn't back-track
         past_states = []
         move = self.down()
         past_states.append(self.squares)
@@ -73,7 +78,9 @@ class Puzzle:
             past_states.append(self.squares)
 
     #movement methods return a touple of the boolean sucess of the move
-    #and a new puzzle *object*, if possible
+    #and a new puzzle *object*, if the move is impossible
+    #Up is defined as moving the blank up one square, down is the reverse, etc.
+    #Definitions don't matter too much so long as they are consistent.
     def down(self):
         for row in range(0, self.size - 1):
             for col in range(0, self.size):
@@ -114,88 +121,7 @@ class Puzzle:
                     return (True, ans)
         return (False, self)
 
-    #returns the number of cycles of the board
-    def board_parity(self):
-        #doesn't count the last cycle since the
-        #list will be full, so start at 1
-        count = 0
-
-        #a basic list of numbers used to make
-        #a permutation
-        basic = []
-        for i in range(1, self.size * self.size):
-            basic.append(i)
-        basic.append(-1)
-
-        #list form of the board
-        list_form = []
-        for row in range(0, self.size):
-            for col in range(0, self.size):
-                list_form.append(self.squares[row][col])
-
-        # print list_form, '\n', basic
-
-        #the list of all the visted ones, stop when we've hit every number
-        visited = []
-        curNum = list_form[0]
-
-        #move through it until you've hit all the numbers
-        while len(visited) < self.size * self.size:
-            #loop through until we find a cycle
-            for i in range(self.size * self.size):
-                if curNum in visited:
-                    #complete cycle, up counter
-                    count += 1
-                    #find a number not in any previous cycle
-                    for j in range(self.size * self.size):
-                        if list_form[j] not in visited:
-                            curNum = list_form[j]
-                            break
-                    break
-                else:
-                    #continue moving through the cycle
-                    visited.append(curNum)
-                    new_Index = list_form.index(curNum)
-                    curNum = basic[new_Index]
-
-        #in the case that it's one long cycle, it doesn't get counted
-        #so compensate for this
-        if count == 0:
-            return 1
-        return count
-
-    #returns a tuple of the position of the blank, zero indexed
-    def find_blank(self):
-        for row in range(self.size):
-            for col in range(self.size):
-                if self.squares[row][col] == -1:
-                    return (row, col)
-
-    #returns the taxicab distance of the blank
-    #from the lower right corner
-    def taxicab(self):
-        return (self.size - 1 * -self.find_blank()[0]) - (
-            self.size - 1 - self.find_blank()[1])
-
-    #returns the invariant number associatied with
-    #the board
-    def invariant(self):
-        return self.taxicab() + self.board_parity()
-
-    #switches two tiles on the board with each other,
-    #neither of which are the blank
-    def switch_not_blank(self):
-        #if neither of the first two are the blank, switch them
-        if self.squares[0][0] != -1 and self.squares[0][1] != -1:
-            store = self.squares[0][0]
-            self.squares[0][0] = self.squares[0][1]
-            self.squares[0][1] = store
-        #otherwise switch the other two
-        else:
-            store = self.squares[1][0]
-            self.squares[1][0] = self.squares[1][1]
-            self.squares[1][1] = store
-
+    #helper function that prints the state of the board.
     def pretty_print(self):
         for row in range(0, self.size):
             for col in range(0, self.size):
@@ -226,6 +152,8 @@ class Puzzle:
 
         return legal_moves
 
+    #A heuristic for determining how far the board state is from the goal state.
+    #It returns the number of misplaced tiles, not counting the blank square.
     def h1(self):
         count = 0
         cur = -1
@@ -236,6 +164,9 @@ class Puzzle:
                     count += 1
         return count
 
+    #A heuristic for determining how far the board state is from the goal state.
+    #Returns the sum of the manhattan distances, defined as far how a square is
+    #from its goal state.
     def h2(self):
         count = 0
         proper_row = 0
@@ -251,6 +182,9 @@ class Puzzle:
                     count += abs(proper_col - col)
         return count
 
+    #A heuristic for determining how far the board state is from the
+    #Goal state.  Returns the number of swaps between the blank square and any
+    #square needed to get to the goal state - a "relaxed" version of the 8-puzzle
     def h3(self):
         board = copy.deepcopy(self.squares)
         count = 0
@@ -314,7 +248,6 @@ class Puzzle:
 
             best_move = heappop(heap)
             if best_move[1].squares == self.my_goal:
-                # print 'goal state reached, path length = ', best_move[1].g
                 return (True, best_move[1].g, count)
             else:
                 sucessors = best_move[1].get_moves()
@@ -339,38 +272,29 @@ class Puzzle:
 
 
 ##testing
-
+#constants
+target_depth = 18
+num_moves_init = 26
+num_heuristic = 1
+size_puzzle = 3
+puzzles_to_solve = 100
+###initialize the dictionary of results
 results = {}
-# for i in range(12, 25):
-#     if i % 2 == 0:
-#         results[i] = (0, 0)
-results[18] = (0, 0)
+results[target_depth] = (0, 0)
+
 while (True):
-    puzzle = Puzzle(3, 26)
-    result = puzzle.search(1)
+    puzzle = Puzzle(size_puzzle, num_moves_init)
+    result = puzzle.search(num_heuristic)
     depth = result[1]
-    # if depth % 2 != 0 or depth > 24 or depth < 12:
-    #     continue
-    if depth != 18:
+    if depth != target_depth:
         continue
     node = result[2]
     times_solved = results[depth][0]
     print times_solved
-    if times_solved < 12:
+    if times_solved < puzzles_to_solve:
         total_node_count = results[depth][1]
         entry = {depth: (times_solved + 1, total_node_count + node)}
         results.update(entry)
-        print results
-        print 'h1'
-    else:
-        # flag = False
-        # for i in range(12, 25):
-        #     if i % 2 == 0:
-        #         if results[i] < 100:
-        #             flag = True
-        #             break
-        # if flag:
-        #     continue
-        # print results
-        print 'h1'
-        break
+        continue
+    break
+print results

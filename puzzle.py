@@ -1,9 +1,11 @@
 import random
 import copy
 from heapq import heappush, heappop
-import time
 
 
+###Helper function outside of the class definition that takes a board
+###and prints it out.
+###Outside of the class definition
 def pretty_print_2(size, board):
     for row in range(0, size):
         for col in range(0, size):
@@ -12,6 +14,9 @@ def pretty_print_2(size, board):
     print ""
 
 
+###Creates a tuple out of a board represented as a list of lists.
+###This is helpful as a tuple is hashable.
+###Outside of the class definition
 def linearize(board):
     a = tuple(board[0])
     for row in range(1, len(board)):
@@ -22,14 +27,13 @@ def linearize(board):
 class Puzzle:
     def __init__(self, size):
         #create instances variables
-        #fucking important to have these in here and not in the class definition
-        #fucks everything up
-        self.size = size
-        self.squares = []
-        self.my_goal = []
-        self.g = 0
+        self.size = size  #size of the board
+        self.squares = []  #board state
+        self.my_goal = []  #solved state
+        self.g = 0  #Length of path.
 
         count = 1
+        ###Create the goal state.
         for i in range(0, size):
             my_row = []
             for j in range(0, size):
@@ -39,7 +43,8 @@ class Puzzle:
                     my_row.append(count)
                 count += 1
             self.my_goal.append(my_row)
-
+        ###Randomize a board by populating it with the integers -1 and 1 through
+        ###size * size -1, inclusive.
         so_far = []
         cur = -1
         taxi_cab = -1
@@ -55,16 +60,15 @@ class Puzzle:
                     my_row.append(cur)
                 else:
                     my_row.append(-1)
-                    # taxi_cab = size - i + size - j - 2
-                    # print "taxi cab: "
-                    # print taxi_cab
             self.squares.append(my_row)
         #ensures we have an (even) solvable puzzle
         if self.invariant() % 2 != 0:
             self.switch_not_blank()
 
     #movement methods return a touple of the boolean sucess of the move
-    #and a new puzzle *object*, if possible
+    #and a new puzzle *object* if returns false.
+    #Up is defined as moving the blank up one square, down is the reverse, etc.
+    #Definitions don't matter too much so long as they are consistent.
     def down(self):
         for row in range(0, self.size - 1):
             for col in range(0, self.size):
@@ -126,7 +130,7 @@ class Puzzle:
 
         # print list_form, '\n', basic
 
-        #the list of all the visted ones, stop when we've hit every number
+        #the list of all the visted squares, stop when we've hit every number
         visited = []
         curNum = list_form[0]
 
@@ -187,6 +191,7 @@ class Puzzle:
             self.squares[1][0] = self.squares[1][1]
             self.squares[1][1] = store
 
+    #helper function that prints the state of the board.
     def pretty_print(self):
         for row in range(0, self.size):
             for col in range(0, self.size):
@@ -197,10 +202,8 @@ class Puzzle:
     #returns a list of legal square states, full puzzle object is passed
     def get_moves(self):
         #returns a list of possible moves, in the form of puzzle objects
-
         legal_moves = []
         move = self.right()
-
         #tests the boolean return
         if move[0]:
             #adds the changed board
@@ -214,9 +217,10 @@ class Puzzle:
         move = self.down()
         if move[0]:
             legal_moves.append(move[1])
-
         return legal_moves
 
+    #A heuristic for determining how far the board state is from the goal state.
+    #It returns the number of misplaced tiles, not counting the blank square.
     def h1(self):
         count = 0
         cur = -1
@@ -227,6 +231,9 @@ class Puzzle:
                     count += 1
         return count
 
+    #A heuristic for determining how far the board state is from the goal state.
+    #Returns the sum of the manhattan distances, defined as far how a square is
+    #from its goal state.
     def h2(self):
         count = 0
         proper_row = 0
@@ -242,6 +249,9 @@ class Puzzle:
                     count += abs(proper_col - col)
         return count
 
+    #A heuristic for determining how far the board state is from the
+    #Goal state.  Returns the number of swaps between the blank square and any
+    #square needed to get to the goal state - a "relaxed" version of the 8-puzzle
     def h3(self):
         board = copy.deepcopy(self.squares)
         count = 0
@@ -326,23 +336,27 @@ class Puzzle:
 
 
 ##testing
+##constants
+my_depth = 16
+puzzles_to_solve = 100
+num_heuristic = 2
+size_puzzle = 3
+#set up the dictionary of results.  Key is depth of solution
 results = {}
-results[16] = (0, 0)
+results[my_depth] = (0, 0)
 
 while (True):
-    puzzle = Puzzle(3)
-    result = puzzle.search(2)
+    puzzle = Puzzle(size_puzzle)
+    result = puzzle.search(num_heuristic)
     depth = result[1]
-    if depth != 16:
+    if depth != my_depth:
         continue
     node = result[2]
     times_solved = results[depth][0]
-    print times_solved
-    if times_solved < 50:
+    if times_solved < puzzles_to_solve:
         total_node_count = results[depth][1]
         entry = {depth: (times_solved + 1, total_node_count + node)}
         results.update(entry)
-        print 'h2'
-        print results
-    else:
-        break
+        continue
+    break
+print results
