@@ -247,11 +247,8 @@ class Puzzle:
         count = 0
         row_b = 0
         col_b = 0
-        print 'here'
         while (True):
             if board == self.my_goal:
-                print self.squares
-                print count
                 return count
             for row in range(self.size):
                 for col in range(self.size):
@@ -290,7 +287,6 @@ class Puzzle:
 
         #inialize
         h = 0
-        print num_h
         if num_h == 1:
             h = self.h1()
         if num_h == 2:
@@ -322,8 +318,6 @@ class Puzzle:
                             heappush(heap, (s.g + s.h2(), s))
                         if num_h == 3:
                             heappush(heap, (s.g + s.h3(), s))
-                        #if num_h == 3:
-                        #heappush(heap, (s.g + s.h3(), s))
             if not heap:
                 best_move[1].pretty_print()
         #if heap empties, then we have failed
@@ -333,21 +327,22 @@ class Puzzle:
 
 ##testing
 results = {}
-results[20] = (0, 0)
+results[16] = (0, 0)
+
 while (True):
     puzzle = Puzzle(3)
-    result = puzzle.search(3)
+    result = puzzle.search(2)
     depth = result[1]
-    if depth != 20:
+    if depth != 16:
         continue
     node = result[2]
     times_solved = results[depth][0]
     print times_solved
-    if times_solved < 22:
+    if times_solved < 50:
         total_node_count = results[depth][1]
         entry = {depth: (times_solved + 1, total_node_count + node)}
         results.update(entry)
+        print 'h2'
         print results
     else:
-        print results
         break

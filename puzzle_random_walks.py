@@ -256,11 +256,11 @@ class Puzzle:
         count = 0
         row_b = 0
         col_b = 0
-        print 'here'
+        # print 'here'
         while (True):
             if board == self.my_goal:
-                print self.squares
-                print count
+                # print self.squares
+                # print count
                 return count
             for row in range(self.size):
                 for col in range(self.size):
@@ -341,25 +341,36 @@ class Puzzle:
 ##testing
 
 results = {}
-for i in range(10, 25):
-    if i % 2 == 0:
-        results[i] = (0, 0)
+# for i in range(12, 25):
+#     if i % 2 == 0:
+#         results[i] = (0, 0)
+results[18] = (0, 0)
 while (True):
-    puzzle = Puzzle(3, 30)
-    result = puzzle.search(3)
+    puzzle = Puzzle(3, 26)
+    result = puzzle.search(1)
     depth = result[1]
-    if depth % 2 != 0 or depth > 24:
+    # if depth % 2 != 0 or depth > 24 or depth < 12:
+    #     continue
+    if depth != 18:
         continue
     node = result[2]
     times_solved = results[depth][0]
     print times_solved
-    if times_solved < 50:
+    if times_solved < 12:
         total_node_count = results[depth][1]
         entry = {depth: (times_solved + 1, total_node_count + node)}
         results.update(entry)
         print results
         print 'h1'
     else:
-        print results
+        # flag = False
+        # for i in range(12, 25):
+        #     if i % 2 == 0:
+        #         if results[i] < 100:
+        #             flag = True
+        #             break
+        # if flag:
+        #     continue
+        # print results
         print 'h1'
         break
