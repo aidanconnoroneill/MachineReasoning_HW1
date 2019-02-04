@@ -1,0 +1,2 @@
+old intro:
+calculated the parity of the each generated board, and changed all the even boards to odd moves by illegally swapping any two pieces (excluding the blank). 
