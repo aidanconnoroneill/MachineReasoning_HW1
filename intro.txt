@@ -1,2 +1,4 @@
 old intro:
-calculated the parity of the each generated board, and changed all the even boards to odd moves by illegally swapping any two pieces (excluding the blank). 
+calculated the parity of the each generated board, and changed all the even boards to odd moves by illegally swapping any two pieces (excluding the blank).
+
+At solution depth size twenty however, the random walks became much longer, and the variability of the solution depths of the puzzles generated also grew. So to generate our data for solution depths size twenty through twenty-four, we generated random boards, and ensured that they were solvable by the process described in our background (section 2). We acknowledge that this switch in our method of generating boards introduces a variable into our data unrelated to A*'s efficiency.
