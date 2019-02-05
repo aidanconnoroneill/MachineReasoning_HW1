@@ -345,6 +345,8 @@ size_puzzle = 3
 results = {}
 results[my_depth] = (0, 0)
 
+print'hello world'
+
 while (True):
     puzzle = Puzzle(size_puzzle)
     result = puzzle.search(num_heuristic)
