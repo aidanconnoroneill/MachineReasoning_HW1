@@ -316,8 +316,8 @@ class Puzzle:
             else:
                 sucessors = best_move[1].get_moves()
                 for s in sucessors:
-                    count += 1
                     if linearize(s.squares) not in past_states:
+                        count += 1
                         past_states.add(linearize(s.squares))
 
                         s.g = best_move[1].g + 1
